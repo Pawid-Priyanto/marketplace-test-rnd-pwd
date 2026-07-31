@@ -90,11 +90,7 @@ MSW intercepts network requests at the browser worker level to mimic real API be
 ### 3. 💾 Decoupled Persistence Strategy
 Master products and order logs are isolated in `localStorage` under segregated keys:
 - `vocamarket_products`: Live inventory catalog and stock counts.
-- `vocamarket_orders`: Immutable transaction history logs.
-
-### 4. 🎨 Utility Patterns & Design System
-- **Centralized `cn()` Utility**: Combines `clsx` and `tailwind-merge` to resolve dynamic class conflicts cleanly.
-- **Modular Components**: Reusable, accessible UI components (`Button`, `Modal`, `Header`, `Sidebar`).
+- `vocamarket_orders_{useremail}`: Immutable transaction history logs.
 
 ---
 
