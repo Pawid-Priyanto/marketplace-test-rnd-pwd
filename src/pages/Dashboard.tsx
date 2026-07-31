@@ -44,6 +44,14 @@ export default function DashboardPage() {
     fetchDashboardData();
   }, []);
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-gray-500 font-medium">Loading Dashboard...</div>
+      </div>
+    );
+  }
+
   const getCategoryIcon = (iconName: string) => {
     switch (iconName) {
       case 'Gamepad2': return <Gamepad2 className="h-6 w-6 text-indigo-600" />;

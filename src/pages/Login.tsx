@@ -18,8 +18,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
+ const [emailError, setEmailError] = useState<string | null>(null);
+const [passwordError, setPasswordError] = useState<string | null>(null);
 
   const validateForm = () => {
     let isValid = true;
