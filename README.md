@@ -1,110 +1,128 @@
-```markdown
-# VocaMarket — Production-Ready Marketplace Web Application
+<div align="center">
 
-A modern, scalable, and maintainable E-Commerce Marketplace application built with **React**, **TypeScript**, **Tailwind CSS**, and **Mock Service Worker (MSW)**.
+# 🛒 VocaMarket
 
-This project is architected with production standards in mind—featuring a decoupled API abstraction layer, real-world backend simulation, persistent storage management, and a clean UI/UX system.
+**A Production-Ready Digital Marketplace Web Application**
 
----
-
-## 🚀 Features
-
-- **Authentication System**: Secure login flow and simulated JWT token management.
-- **Product Catalog & Discovery**:
-  - Browse available products with responsive grid layouts.
-  - Real-time client & server search filter.
-  - Category filtration & multi-attribute sorting (Price, Name, Popularity).
-  - Product detail modal/view with dynamic stock availability.
-- **Cart & Checkout Engine**:
-  - Interactive shopping cart management.
-  - Multi-step checkout process with real-time stock verification.
-  - Conflict handling (e.g., stock depletion / insufficient stock).
-- **Order History Dashboard**:
-  - Transaction tracking with order status filtering (`All`, `Completed`, `Pending`, `Failed`).
-  - Search order history by Invoice ID or Product Name.
-  - Pagination system for high-volume transactions.
-- **Resilient UI/UX States**:
-  - Granular loading indicators (spinners).
-  - Graceful error states and fallback handling for unbuilt pages (404/Coming Soon).
+[![React](https://img.shields.io/badge/React-18.x-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-5.x-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.x-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![MSW](https://img.shields.io/badge/MSW-2.x-FF6A00?style=for-the-badge&logo=mockserviceworker&logoColor=white)](https://mswjs.io/)
+[![Vitest](https://img.shields.io/badge/Vitest-1.x-6E9F18?style=for-the-badge&logo=vitest&logoColor=white)](https://vitest.dev/)
 
 ---
 
-## 🛠️ Tech Stack & Key Libraries
+A modern, scalable, and maintainable E-Commerce Marketplace application built with production standards in mind—featuring a decoupled API abstraction layer, real-world backend simulation, persistent storage management, and full E2E integration testing.
 
-- **Frontend**: React 18, TypeScript, Vite
-- **Styling**: Tailwind CSS, `clsx` + `tailwind-merge` (`cn` utility pattern)
-- **Icons**: Lucide React
-- **API Mocking & Backend Simulation**: Mock Service Worker (MSW)
-- **Data Persistence Layer**: Browser `localStorage` (Isolated store strategy)
-- **Routing**: React Router v6
+</div>
+
+<br />
+
+> 🎯 **Key Focus**: Decoupled architecture, realistic API simulation, robust edge-case handling (stock conflicts, network latency), and comprehensive testing.
+
+---
+
+## ⚡ Quick Links
+
+- [🚀 Key Features](#-key-features)
+- [🛠️ Tech Stack](#️-tech-stack)
+- [🏗️ Architecture & Engineering](#️-architecture--engineering)
+- [🚦 Getting Started](#-getting-started--local-setup)
+- [🧪 Running Tests](#-testing)
+
+---
+
+## 🚀 Key Features
+
+### 🔐 Authentication System
+- Secure login and registration flows.
+- Simulated JWT token management with route guards (`ProtectedRoute` & `GuestRoute`).
+
+### 🛍️ Product Catalog & Discovery
+- Responsive product grid with real-time client & server search.
+- Multi-attribute filtering & sorting (**Price**, **Name**, **Popularity**).
+- Product details with dynamic live stock indicators.
+
+### 🛒 Cart & Checkout Engine
+- Interactive real-time cart state management using Zustand.
+- Multi-step checkout pipeline with instant stock verification.
+- **Conflict Resolution**: Handles stock depletion and out-of-stock edge cases gracefully.
+
+### 📜 Order History Dashboard
+- Comprehensive transaction logs with invoice generation (e.g., `INV-XXXXXX`).
+- Status filtering (`All`, `Completed`, `Pending`, `Failed`).
+- Instant search by Invoice ID or Product Name with pagination support.
+
+### 🎨 Resilient UI/UX States
+- Granular loading indicators and skeleton fallbacks.
+- Interactive **"Feature Coming Soon"** fallbacks for unbuilt routes.
+
+---
+
+## 🛠️ Tech Stack
+
+| Domain | Technologies Used |
+| :--- | :--- |
+| **Core Framework** | React 18, TypeScript, Vite |
+| **State Management** | Zustand (Auth & Cart stores) |
+| **Styling & UI** | Tailwind CSS, Lucide Icons, `clsx` + `tailwind-merge` (`cn` utility) |
+| **Routing** | React Router v6 |
+| **API Abstraction & Mocking** | Custom Service Layer + Mock Service Worker (MSW) |
+| **Testing** | Vitest, React Testing Library, `jsdom` |
+| **Persistence** | Browser `localStorage` (Isolated store strategy) |
 
 ---
 
 ## 🏗️ Architecture & Engineering Decisions
 
-### 1. Seamless API Abstraction Layer
-To ensure the application can effortlessly transition from MSW mocks to a real backend in production, all API calls are abstracted behind dedicated service layers (e.g., `OrderService`, `ProductService`).
-- UI components **never** directly call `fetch` or `axios`.
-- Endpoints and base URLs are defined centrally. Swapping MSW for a real REST API only requires updating the endpoint configuration or environment variables without touching UI logic.
+### 1. 🔌 Seamless API Abstraction Layer
+All HTTP calls are isolated within dedicated service modules (e.g., `OrderService`, `ProductService`).
+- Components **never** call `fetch` or `axios` directly.
+- Switching from MSW mock handlers to a live production backend requires **zero UI changes**—simply update the endpoint configuration.
 
-### 2. Real-World Backend Simulation (MSW)
-The Mock Service Worker intercepts requests at the network layer, simulating production conditions:
-- **Network Latency**: Artificial response delays (e.g., `delay(1500)`) to test loading spinners and skeleton UI.
-- **Stock Depletion Logic**: Atomically reduces available stock upon checkout and returns a `409 Conflict` status if requested quantities exceed inventory.
-- **HTTP Status Codes**: Simulates `200 OK`, `401 Unauthorized`, `409 Conflict`, and `500 Internal Server Error`.
+### 2. 🎭 Real-World Backend Simulation (MSW)
+MSW intercepts network requests at the browser worker level to mimic real API behavior:
+- **Artificial Latency**: Simulated network delays (`delay(1500)`) to test loading UI states.
+- **Atomic Stock Management**: Decrements inventory upon checkout and fires `409 Conflict` if demand exceeds supply.
+- **HTTP Status Codes**: Simulates realistic `200 OK`, `401 Unauthorized`, `409 Conflict`, and `500 Server Error` responses.
 
-### 3. Decoupled Persistence Strategy
-Data integrity between master products and order records is preserved in `localStorage` via segregated storage keys:
-- `vocamarket_products`: Holds master inventory catalog and live stock counts.
-- `vocamarket_orders`: Holds immutable historical transaction logs.
+### 3. 💾 Decoupled Persistence Strategy
+Master products and order logs are isolated in `localStorage` under segregated keys:
+- `vocamarket_products`: Live inventory catalog and stock counts.
+- `vocamarket_orders`: Immutable transaction history logs.
 
-### 4. Modular Component Architecture & Utility Patterns
-- **Utility Class Management**: Implemented a central `cn()` helper blending `clsx` and `tailwind-merge` to handle conditional dynamic classes without Tailwind specificity conflicts.
-- **Design System Consistency**: Reusable UI components (`Button`, `Header`, `Sidebar`, Modal wrappers) adhering to modern accessible design standards.
+### 4. 🎨 Utility Patterns & Design System
+- **Centralized `cn()` Utility**: Combines `clsx` and `tailwind-merge` to resolve dynamic class conflicts cleanly.
+- **Modular Components**: Reusable, accessible UI components (`Button`, `Modal`, `Header`, `Sidebar`).
 
 ---
 
-## 📋 Assumptions Made
+## 📋 Key Assumptions
 
-1. **User Session**: User authentication state is simulated and maintained across sessions using browser storage.
-2. **Stock Verification**: Stock verification occurs synchronously during checkout within MSW handlers.
-3. **Undeveloped Features Graceful Fallback**: Any navbar menu or route not currently within the phase-1 scope routes to an interactive **"Feature Coming Soon"** fallback page to maintain UI continuity.
+1. **User Sessions**: Auth state is maintained via browser storage across page refreshes.
+2. **Synchronous Inventory Check**: Stock verification occurs during checkout submission in MSW handlers.
+3. **Graceful Routing**: Scope-2 routes automatically render an interactive **"Coming Soon"** view to preserve navigation flow.
 
 ---
 
 ## 🚦 Getting Started & Local Setup
 
 ### Prerequisites
-- **Node.js**: `v18.x` or higher
-- **Package Manager**: `npm` or `yarn` / `pnpm`
+- **Node.js**: `v18.0.0` or higher
+- **Package Manager**: `npm` (v9+) or `yarn` / `pnpm`
 
-### Installation Steps
+### Installation
 
-1. **Clone the Repository**
-   ```bash
-   git clone [https://github.com/your-username/vocamarket.git](https://github.com/your-username/vocamarket.git)
-   cd vocamarket
-
-```
-
-2. **Install Dependencies**
 ```bash
+# 1. Clone the repository
+git clone [https://github.com/Pawid-Priyanto/marketplace-test-rnd-pwd.git](https://github.com/Pawid-Priyanto/marketplace-test-rnd-pwd.git)
+
+# 2. Navigate into the project directory
+cd your-project-name
+
+# 3. Install dependencies
 npm install
 
-```
-
-
-3. **Start the Development Server**
-```bash
+# 4. Start the development server
 npm run dev
-
-```
-
-
-*Note: MSW worker will automatically register in the browser environment.*
-4. **Open in Browser**
-Navigate to `http://localhost:5173` (or the port displayed in your terminal).
-
-```
-
-```

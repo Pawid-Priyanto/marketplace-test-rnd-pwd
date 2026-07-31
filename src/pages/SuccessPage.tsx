@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Check, Copy, CheckCheck } from 'lucide-react';
 import {Button} from '../components/Button'
@@ -49,7 +49,7 @@ export function SuccessPage() {
 
           <div className="pt-3 border-t border-gray-200/60 flex items-center justify-between text-xs">
             <span className="text-gray-500 font-medium">Estimated Delivery</span>
-            <span className="font-bold text-gray-900">{orderData.estimatedTime || '< 30 seconds'}</span>
+            <span className="font-bold text-gray-900">{orderData.estimatedTime || '< 30 Minutes'}</span>
           </div>
         </div>
 

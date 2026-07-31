@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import { Sidebar } from '../components/Sidebar';
 import { Header } from '../components/Header';
 import { OrderService } from '../lib/order.service';
@@ -17,10 +17,12 @@ export function OrderHistoryPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5; // Ubah jumlah item per halaman sesuai kebutuhan
 
+  const userEmail = localStorage.getItem('auth_user') ? JSON.parse(localStorage.getItem('auth_user') as string) : null;
+
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await OrderService.getOrders();
+        const response = await OrderService.getOrders(userEmail?.email as string);
         console.log('Fetched Orders:', response);
         if (response.success && Array.isArray(response.data)) {
           setOrders(response.data);

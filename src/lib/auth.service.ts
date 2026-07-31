@@ -1,5 +1,6 @@
 import { apiClient } from './api';
 
+
 export interface LoginPayload {
   email: string;
   password: string;
@@ -27,6 +28,8 @@ export interface AuthResponse {
   };
 }
 
+export const userEmail:  User | null = localStorage.getItem('auth_user') ? JSON.parse(localStorage.getItem('auth_user') as string) : null;
+
 
 export const AuthService = {
   login: async (payload: LoginPayload): Promise<AuthResponse> => {
@@ -52,8 +55,7 @@ export const AuthService = {
   logout: () => {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('auth_user');
-    localStorage.removeItem('vocamarket_products');
-    
+   
   },
 
 

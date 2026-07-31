@@ -2,6 +2,13 @@ import { http, HttpResponse, delay } from 'msw';
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+}
+
 // --- DATABASE Mock ---
 export const masterProducts = [
   // --- GAMES (10 Products) ---
@@ -111,6 +118,10 @@ export const masterProducts = [
   },
 ];
 
+    export const userEmail:  User | null = localStorage.getItem('auth_user') ? JSON.parse(localStorage.getItem('auth_user') as string) : null;
+
+    console.log('User Email from localStorage:', userEmail?.email);
+ 
 
 
 // --- HELPER STORAGE ---
@@ -129,26 +140,36 @@ const saveStoredProducts = (products: any[]) => {
   localStorage.setItem('vocamarket_products', JSON.stringify(products));
 };
 
-const getStoredOrders = () => {
-  const stored = localStorage.getItem('vocamarket_orders');
+export const getStoredOrders = (userEmail: string) => {
+  const storageKey = `vocamarket_orders_${userEmail}`;
+  const stored = localStorage.getItem(storageKey);
+
   if (stored) {
     return JSON.parse(stored);
   }
-  // Data default awal jika localStorage masih kosong
-  const initialOrders = [
+
+  if (userEmail === 'admin@marketplace.com') {
+     const initialOrders = [
     { id: 'INV-202660018', productSummary: 'MLBB 86 Diamonds (x2), Steam Wallet $10 (x1)', amount: 14.38, status: 'Completed', date: 'May 20, 2026 10:30 AM' },
     { id: 'INV-202660017', productSummary: 'PUBG UC 60', amount: 0.99, status: 'Pending', date: 'May 20, 2026 09:15 AM' },
     { id: 'INV-202660016', productSummary: 'Google Play Gift Card $5', amount: 5.00, status: 'Completed', date: 'May 19, 2026 08:45 PM' },
     { id: 'INV-202660015', productSummary: 'iTunes Gift Card $10', amount: 10.00, status: 'Failed', date: 'May 19, 2026 07:20 PM' },
     { id: 'INV-202660014', productSummary: 'Free Fire 100 Diamonds', amount: 0.99, status: 'Completed', date: 'May 19, 2026 06:10 PM' },
   ];
-  localStorage.setItem('vocamarket_orders', JSON.stringify(initialOrders));
-  return initialOrders;
+    localStorage.setItem(storageKey, JSON.stringify(initialOrders));
+    return initialOrders;
+  }
+
+  localStorage.setItem(storageKey, JSON.stringify([]));
+  return [];
 };
 
 
+
 const saveStoredOrders = (orders: any[]) => {
-  localStorage.setItem('vocamarket_orders', JSON.stringify(orders));
+
+  const storageKey = `vocamarket_orders_${userEmail?.email}`;
+  localStorage.setItem(storageKey, JSON.stringify(orders));
 };
 
 export const handlers = [
@@ -227,7 +248,7 @@ export const handlers = [
     const sortBy = url.searchParams.get('sortBy') || 'Popular';
 
     // 1. Filtering
-    let result = getStoredProducts().filter((item) => {
+    let result = getStoredProducts().filter((item: any) => {
       const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase()) || 
                             item.category.toLowerCase().includes(search.toLowerCase());
       const matchesCategory = category === 'All Categories' || item.category === category;
@@ -235,7 +256,7 @@ export const handlers = [
     });
 
     // 2. Sorting
-    result.sort((a, b) => {
+    result.sort((a: any, b: any) => {
       if (sortBy === 'Lowest Price') return a.price - b.price;
       if (sortBy === 'Highest Price') return b.price - a.price;
       return b.rating - a.rating; // Popular
@@ -262,7 +283,7 @@ export const handlers = [
 
   http.get('/api/products/:id', ({ params }) => {
   const { id } = params;
-  const product = getStoredProducts().find((item) => item.id === id);
+  const product = getStoredProducts().find((item: any) => item.id === id);
 
   if (!product) {
     return HttpResponse.json(
@@ -276,6 +297,7 @@ export const handlers = [
     data: product,
   });
 }),
+
 
   http.post('/api/checkout', async ({ request }) => {
     await delay(1500);
@@ -309,7 +331,7 @@ export const handlers = [
       date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ' ' + new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
     };
 
-    const orders = getStoredOrders();
+    const orders = getStoredOrders(userEmail?.email || '');
     console.log('Existing Orders:', orders, newOrder);
     orders.unshift(newOrder);
     saveStoredOrders(orders);
@@ -322,9 +344,23 @@ export const handlers = [
   }),
 
   // 5. ORDERS
-  http.get(`${API_URL}/api/orders`, async () => {
-    await delay(600);
-    return HttpResponse.json({ success: true, data: getStoredOrders() });
+ http.get('/api/orders', ({ request }) => {
+    const url = new URL(request.url);
+    const email = url.searchParams.get('email');
+
+    if (!email || email === 'undefined' || email === 'null') {
+      return HttpResponse.json(
+        { success: false, message: 'Email parameter is required' },
+        { status: 400 }
+      );
+    }
+
+    const userOrders = getStoredOrders(email);
+
+    return HttpResponse.json({
+      success: true,
+      data: userOrders,
+    });
   }),
 
   // 6. Dashboard Stats

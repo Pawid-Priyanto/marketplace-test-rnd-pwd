@@ -1,8 +1,8 @@
 import { apiClient } from './api';
 
 export const OrderService = {
-  getOrders: async () => {
-    const response = await apiClient.get('/api/orders');
+  getOrders: async (email: string) => {
+    const response = await apiClient.get('/api/orders', { params: { email } });
     return response.data;
   },
   checkout: async (payload: any) => {

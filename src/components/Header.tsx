@@ -1,4 +1,3 @@
-import React from 'react';
 import { Search, Bell } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 
